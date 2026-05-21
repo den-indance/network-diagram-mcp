@@ -1,0 +1,25 @@
+# dependencies
+node_modules/
+
+# logs
+*.log
+npm-debug.log*
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.claude/
+
+# env files
+.env
+.env.*
+!.env.example
+
+# packaging artifacts
+*.tgz
+
+# internal planning docs (not for npm/registry publication)
+docs/plans/
+docs/strategy.md

@@ -1,0 +1,55 @@
+{
+  "name": "@den.dance/network-diagram-mcp",
+  "version": "1.0.1",
+  "description": "Visual network topology editor with AI agent integration via MCP. One-click SSH + web-service access from any node, nmap/CSV import, smart auto-layout, multi-sheet, local-first. Open-source successor to netViz (CA Technologies, 1990-2012).",
+  "type": "module",
+  "main": "./index.js",
+  "bin": {
+    "network-diagram-mcp": "index.js"
+  },
+  "files": [
+    "index.js",
+    "bridge.js",
+    "handlers.js",
+    "tools.js",
+    "netmap.png",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "ai",
+    "llm",
+    "network-diagram",
+    "network-topology",
+    "netviz",
+    "dcim",
+    "network-documentation",
+    "topology-editor",
+    "nmap",
+    "ssh",
+    "network-mapping",
+    "infrastructure",
+    "sysadmin",
+    "sre",
+    "devops"
+  ],
+  "author": {
+    "name": "Denys Malieiev",
+    "url": "https://den.dance/"
+  },
+  "license": "MIT",
+  "homepage": "https://map.den.dance/",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "ws": "^8.0.0"
+  }
+}
