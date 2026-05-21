@@ -1,5 +1,7 @@
 # @den.dance/network-diagram-mcp
 
+[![npm](https://img.shields.io/npm/v/@den.dance/network-diagram-mcp)](https://www.npmjs.com/package/@den.dance/network-diagram-mcp)
+
 > Visual network topology editor with AI agent integration via the Model Context Protocol.
 > Open-source successor to **netViz** (netViz Inc., 1990 → CA Technologies → discontinued 2012).
 >
@@ -56,7 +58,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "netmap": {
       "command": "npx",
-      "args": ["-y", "@den.dance/network-diagram-mcp"]
+      "args": ["@den.dance/network-diagram-mcp"]
     }
   }
 }
@@ -65,13 +67,13 @@ Add to `claude_desktop_config.json`:
 ### Claude Code
 
 ```bash
-claude mcp add netmap -- npx -y @den.dance/network-diagram-mcp
+claude mcp add netmap -- npx @den.dance/network-diagram-mcp
 ```
 
 With a custom port:
 
 ```bash
-claude mcp add netmap -e NETMAP_MCP_PORT=12345 -- npx -y @den.dance/network-diagram-mcp
+claude mcp add netmap -e NETMAP_MCP_PORT=12345 -- npx @den.dance/network-diagram-mcp
 ```
 
 Then open https://map.den.dance/, go to **Settings → MCP Agent Bridge**, toggle **Enable WebSocket connection**.
@@ -297,8 +299,8 @@ Detailed status (with URL and hints) is shown inside **Settings → MCP Agent Br
 ## Running from source (for contributors)
 
 ```bash
-git clone <repo>          # private — ask Denys for access
-cd netmap/mcp-server
+git clone https://github.com/den-indance/network-diagram-mcp.git
+cd network-diagram-mcp
 npm install
 node index.js
 ```
@@ -308,7 +310,7 @@ Override port: `NETMAP_MCP_PORT=12345 node index.js`.
 Register the local build in Claude Code instead of npm:
 
 ```bash
-claude mcp add netmap-dev -- node /absolute/path/to/netmap/mcp-server/index.js
+claude mcp add netmap-dev -- node /absolute/path/to/network-diagram-mcp/index.js
 ```
 
 ## License

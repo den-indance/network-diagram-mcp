@@ -1,6 +1,6 @@
 {
   "name": "@den.dance/network-diagram-mcp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Visual network topology editor with AI agent integration via MCP. One-click SSH + web-service access from any node, nmap/CSV import, smart auto-layout, multi-sheet, local-first. Open-source successor to netViz (CA Technologies, 1990-2012).",
   "type": "module",
   "main": "./index.js",
@@ -45,6 +45,13 @@
   },
   "license": "MIT",
   "homepage": "https://map.den.dance/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/den-indance/network-diagram-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/den-indance/network-diagram-mcp/issues"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
