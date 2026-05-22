@@ -1,6 +1,7 @@
 {
   "name": "@den.dance/network-diagram-mcp",
-  "version": "1.0.3",
+  "version": "1.0.4",
+  "mcpName": "io.github.den-indance/network-diagram-mcp",
   "description": "Visual network topology editor with AI agent integration via MCP. One-click SSH + web-service access from any node, nmap/CSV import, smart auto-layout, multi-sheet, local-first. Open-source successor to netViz (CA Technologies, 1990-2012).",
   "type": "module",
   "main": "./index.js",

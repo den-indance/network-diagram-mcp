@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.den-indance/network-diagram-mcp",
+  "description": "Network topology editor — Claude builds diagrams via MCP. nmap/CSV import, one-click SSH.",
+  "repository": {
+    "url": "https://github.com/den-indance/network-diagram-mcp",
+    "source": "github"
+  },
+  "version": "1.0.4",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@den.dance/network-diagram-mcp",
+      "version": "1.0.4",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "NETMAP_MCP_PORT",
+          "description": "Local WebSocket port the bridge listens on. Defaults to 47821. Must match the URL configured in NetMap's Settings → MCP Agent Bridge.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}
