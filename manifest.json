@@ -1,0 +1,66 @@
+{
+  "manifest_version": "0.3",
+  "name": "network-diagram-mcp",
+  "display_name": "NetMap — Network Diagram MCP",
+  "version": "1.0.5",
+  "description": "Network topology editor — Claude builds diagrams via MCP. nmap/CSV import, one-click SSH.",
+  "long_description": "Visual network topology editor with 44 MCP tools. Claude / Cursor / Claude Desktop edit a live in-browser diagram at https://map.den.dance/ via a stdio↔WebSocket bridge. Features: CRUD on nodes / connections / stickies, multi-sheet workspaces, smart auto-layout (force-directed, cluster-by-type, cluster-by-connection), one-click SSH and web-service access from any node card, `nmap -oX` and CSV inventory import with auto-typing, JSON / PNG / PDF export. Local-first, no cloud. Open-source successor to netViz (CA Technologies, 1990–2012).\n\nRequires an open NetMap browser tab with Settings → ⚙ → MCP Agent Bridge → Enable WebSocket connection — the bundle runs the stdio MCP server locally and bridges to the tab over WebSocket on localhost.",
+  "author": {
+    "name": "Denys Malieiev",
+    "email": "denismaleev95@gmail.com",
+    "url": "https://den.dance/"
+  },
+  "homepage": "https://map.den.dance/",
+  "documentation": "https://github.com/den-indance/network-diagram-mcp#readme",
+  "support": "https://github.com/den-indance/network-diagram-mcp/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/den-indance/network-diagram-mcp"
+  },
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "ai",
+    "llm",
+    "network-diagram",
+    "network-topology",
+    "netviz",
+    "dcim",
+    "nmap",
+    "ssh",
+    "infrastructure",
+    "sysadmin",
+    "devops"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/index.js"],
+      "env": {
+        "NETMAP_MCP_PORT": "${user_config.netmap_port}"
+      }
+    }
+  },
+  "user_config": {
+    "netmap_port": {
+      "type": "number",
+      "title": "WebSocket Port",
+      "description": "Local WebSocket port the bridge listens on. Must match the URL configured in the NetMap browser tab's Settings → MCP Agent Bridge.",
+      "default": 47821,
+      "required": false,
+      "min": 1024,
+      "max": 65535
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "linux", "win32"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  }
+}
