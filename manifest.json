@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "network-diagram-mcp",
   "display_name": "NetMap — Network Diagram MCP",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Network topology editor — Claude builds diagrams via MCP. nmap/CSV import, one-click SSH.",
   "long_description": "Visual network topology editor with 44 MCP tools. Claude / Cursor / Claude Desktop edit a live in-browser diagram at https://map.den.dance/ via a stdio↔WebSocket bridge. Features: CRUD on nodes / connections / stickies, multi-sheet workspaces, smart auto-layout (force-directed, cluster-by-type, cluster-by-connection), one-click SSH and web-service access from any node card, `nmap -oX` and CSV inventory import with auto-typing, JSON / PNG / PDF export. Local-first, no cloud. Open-source successor to netViz (CA Technologies, 1990–2012).\n\nRequires an open NetMap browser tab with Settings → ⚙ → MCP Agent Bridge → Enable WebSocket connection — the bundle runs the stdio MCP server locally and bridges to the tab over WebSocket on localhost.",
   "author": {
