@@ -18,6 +18,7 @@
     "url": "https://github.com/den-indance/network-diagram-mcp"
   },
   "license": "MIT",
+  "icon": "icon.png",
   "keywords": [
     "mcp",
     "model-context-protocol",
