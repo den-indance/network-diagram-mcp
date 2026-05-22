@@ -1,6 +1,7 @@
 # @den.dance/network-diagram-mcp
 
 [![npm](https://img.shields.io/npm/v/@den.dance/network-diagram-mcp)](https://www.npmjs.com/package/@den.dance/network-diagram-mcp)
+[![smithery badge](https://smithery.ai/badge/den-indance/network-diagram-mcp)](https://smithery.ai/servers/den-indance/network-diagram-mcp)
 
 > Visual network topology editor with AI agent integration via the Model Context Protocol.
 > Open-source successor to **netViz** (netViz Inc., 1990 → CA Technologies → discontinued 2012).
