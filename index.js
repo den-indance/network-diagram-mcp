@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { readFileSync } from "node:fs";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
@@ -9,9 +10,10 @@ const PORT = parseInt(process.env.NETMAP_MCP_PORT || "47821", 10);
 
 const { sendCommand } = createBridge({ port: PORT });
 
-// NOTE: version must stay in sync with package.json on every release.
+const pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf-8"));
+
 const server = new Server(
-  { name: "netmap", version: "1.0.0" },
+  { name: "netmap", version: pkg.version },
   { capabilities: { tools: {} } },
 );
 
