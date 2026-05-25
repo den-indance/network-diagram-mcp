@@ -1,41 +1,79 @@
+import http from "node:http";
 import { WebSocketServer } from "ws";
+import { handleHttp } from "./http-handler.js";
 
 export const CMD_TIMEOUT_MS = 5000;
 
 /**
- * Create a WebSocket bridge that the NetMap browser connects to.
+ * Create a bridge that:
+ *   1. Serves the WS protocol the NetMap browser uses (existing tools API)
+ *   2. Serves the HTTP endpoints used by the agent-bundle URL handlers
+ *      (/status, /detect, /exec) — see http-handler.js
+ *
+ * Both share the same http.Server on the same port.
  *
  * @param {object} opts
- * @param {number} opts.port  — port to listen on (use 0 for random in tests)
- * @param {number} [opts.timeoutMs=5000]  — per-command timeout
- * @returns {{
- *   wss: import("ws").WebSocketServer,
- *   ready: Promise<void>,
- *   sendCommand: (tool: string, params?: object, opts?: {timeoutMs?: number}) => Promise<any>,
- *   pending: Map<string, {resolve:Function, reject:Function, timer:any}>,
- *   getBrowserWs: () => any,
- *   close: () => Promise<void>,
- * }}
+ * @param {number} opts.port
+ * @param {number} [opts.timeoutMs=5000]
+ * @param {string | (() => string|null) | null} [opts.token=null] — string,
+ *   thunk (called lazily on first /exec, allows catalog scanners to introspect
+ *   without HOME write access), or null (disables /exec auth → all 401)
+ * @param {string[]} [opts.corsWhitelist] — overrides DEFAULT_CORS_WHITELIST
+ * @param {Function} [opts.spawn] — for tests, override child_process.spawn
+ * @param {string} [opts.platform] — for tests, override process.platform
+ * @param {object} [opts.detectDeps] — passed to adapter.detect() (e.g. mocked exec/fs)
  */
-export function createBridge({ port, timeoutMs = CMD_TIMEOUT_MS } = {}) {
-  const wss = new WebSocketServer({ port });
+export function createBridge({
+  port,
+  timeoutMs = CMD_TIMEOUT_MS,
+  token = null,
+  corsWhitelist,
+  spawn,
+  platform,
+  detectDeps,
+} = {}) {
   let browserWs = null;
   let unavailableReason = null;
   const pending = new Map();
 
-  // Defensive: WS bind failures (EADDRINUSE etc.) and other server errors
+  const httpServer = http.createServer(async (req, res) => {
+    let resolvedToken = token;
+    if (typeof resolvedToken === "function") {
+      try {
+        resolvedToken = resolvedToken();
+      } catch {
+        resolvedToken = null;
+      }
+    }
+    await handleHttp(req, res, {
+      token: resolvedToken,
+      corsWhitelist,
+      spawn,
+      platform,
+      detectDeps,
+      getBrowserState: () => ({ connected: browserWs !== null }),
+    });
+  });
+
+  const wss = new WebSocketServer({ server: httpServer });
+
+  // Defensive: bind failures (EADDRINUSE etc.) and other server errors
   // must NOT crash the MCP process. Tools introspection by sandboxed registries
   // (Smithery, Claude Desktop probes) starts the server with port 47821 already
   // taken; without this handler the unhandled 'error' / rejected `ready` aborts
   // the whole stdio session before tools/list can run.
-  wss.on("error", (err) => {
+  const onError = (err) => {
     if (!unavailableReason) unavailableReason = err.message || String(err);
-    try { console.error(`[netmap-mcp] WebSocket bridge unavailable: ${unavailableReason}`); } catch {}
-  });
+    try {
+      console.error(`[netmap-mcp] bridge unavailable: ${unavailableReason}`);
+    } catch {}
+  };
+  httpServer.on("error", onError);
+  wss.on("error", onError);
 
   const ready = new Promise((resolve, reject) => {
-    wss.once("listening", resolve);
-    wss.once("error", reject);
+    httpServer.once("listening", resolve);
+    httpServer.once("error", reject);
   });
   // No-op catch so callers that don't await `ready` (production index.js)
   // don't trip Node's unhandledRejection-is-fatal default. Tests that DO
@@ -57,8 +95,12 @@ export function createBridge({ port, timeoutMs = CMD_TIMEOUT_MS } = {}) {
       } catch {}
     });
 
-    ws.on("close", () => { if (browserWs === ws) browserWs = null; });
-    ws.on("error", () => { if (browserWs === ws) browserWs = null; });
+    ws.on("close", () => {
+      if (browserWs === ws) browserWs = null;
+    });
+    ws.on("error", () => {
+      if (browserWs === ws) browserWs = null;
+    });
   });
 
   function sendCommand(tool, params = {}, opts = {}) {
@@ -88,13 +130,17 @@ export function createBridge({ port, timeoutMs = CMD_TIMEOUT_MS } = {}) {
       p.reject(new Error("Bridge closed"));
     }
     pending.clear();
-    // Terminate any live client sockets so wss.close() resolves quickly.
     for (const client of wss.clients) client.terminate();
-    return new Promise((resolve) => wss.close(() => resolve()));
+    return new Promise((resolve) => {
+      httpServer.close(() => resolve());
+    });
   }
+
+  httpServer.listen(port);
 
   return {
     wss,
+    server: httpServer,
     ready,
     sendCommand,
     pending,

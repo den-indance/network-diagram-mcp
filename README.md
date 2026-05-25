@@ -13,8 +13,10 @@
 ## What makes it different
 
 - **One-click ops dashboard.** Click any web port (80 / 443 / 8080 / …) on a node card to open the
-  service in a new tab. Click an SSH port to drop `ssh user@host -p port` into your clipboard **and**
-  launch your system SSH handler (Terminal / iTerm / Termius / PuTTY). Your diagram is also your jump host.
+  service in a new tab. Click an SSH / Postgres / Redis port → in-app picker offers your installed
+  clients (iTerm / Windows Terminal / psql / DBeaver / redis-cli / RDM / …) and launches the one you
+  choose. The picker re-detects every click — newly installed clients show up immediately, never a
+  silent locked-in default.
 - **AI agents edit the map.** 44 MCP tools — your Claude / Cursor / Claude Desktop session can build
   a diagram for you, search across nodes / ports / notes, run smart auto-layouts, export PNG / PDF —
   all by talking to the open browser tab.
@@ -44,9 +46,10 @@ LLM agent (Claude Code / Claude Desktop / Cursor)
 NetMap in browser (https://map.den.dance/)  ←  React state updates live
 ```
 
-> ⚠️ **Requires an open NetMap browser tab.** Open https://map.den.dance/ and enable
-> `Settings → ⚙ → MCP Agent Bridge → Enable WebSocket connection` **before** the agent calls any
-> tool. Without an open tab the bridge has no peer and every tool call will time out.
+> ⚠️ **Requires an open NetMap browser tab.** Open https://map.den.dance/ — the MCP bridge is
+> enabled by default (v1.2+), so the connection comes up as soon as the tab is open. Without an
+> open tab the bridge has no peer and every tool call will time out. (To opt out:
+> `Settings → ⚙ → Integrations → AI Agent (MCP) → Enable WebSocket connection`.)
 
 ## Install
 
@@ -77,7 +80,7 @@ With a custom port:
 claude mcp add netmap -e NETMAP_MCP_PORT=12345 -- npx @den.dance/network-diagram-mcp
 ```
 
-Then open https://map.den.dance/, go to **Settings → MCP Agent Bridge**, toggle **Enable WebSocket connection**.
+Then open https://map.den.dance/ — the bridge is enabled by default (v1.2+). Settings → **Integrations → AI Agent (MCP)** if you need to inspect or toggle the connection.
 The toolbar will show a 🟢 **MCP online** badge when the browser and server are connected.
 
 Verify the agent side:
@@ -92,7 +95,60 @@ You should see `netmap` in the list.
 
 | Var | Default | Description |
 |-----|---------|-------------|
-| `NETMAP_MCP_PORT` | `47821` | Local WebSocket port the bridge listens on. Must match the URL configured in NetMap's Settings → MCP Agent Bridge. |
+| `NETMAP_MCP_PORT` | `47821` | Local WebSocket port the bridge listens on. Must match the URL configured in NetMap's Settings → Integrations → AI Agent (MCP). |
+
+## URL Protocol Handlers + in-app client picker (v1.1+, picker since v1.2)
+
+This package also ships an OS-level agent that registers handlers for `ssh://`,
+`postgres://`, and `redis://` URLs. Click any such link in a browser or terminal
+and the agent spawns your installed client (psql / redis-cli / iTerm /
+Windows Terminal / kitty / DBeaver / TablePlus / RedisInsight / …).
+
+**Inside NetMap (v1.2+):** when the `serve` daemon is running, clicking an
+SSH / Postgres / Redis port button on a node card opens an in-app picker of
+installed clients on your machine and launches the one you pick — every click
+re-detects, so newly installed clients show up immediately. Without the daemon,
+port-clicks fall back to the OS default URL handler.
+
+Install once per machine:
+
+```bash
+# Linux:   ~/.local/share/applications/netmap-<scheme>-handler.desktop + xdg-mime
+# macOS:   ~/Library/Application Support/NetMap/handlers/NetMap<Scheme>Handler.app + lsregister
+# Windows: HKCU\Software\Classes\<scheme>  (per-user, no admin)
+npx @den.dance/network-diagram-mcp install --all
+```
+
+Other CLI subcommands:
+
+```bash
+npx @den.dance/network-diagram-mcp install ssh        # single scheme
+npx @den.dance/network-diagram-mcp uninstall postgres # remove registration
+npx @den.dance/network-diagram-mcp list               # what's registered (JSON)
+npx @den.dance/network-diagram-mcp detect ssh         # which clients are available
+npx @den.dance/network-diagram-mcp serve              # daemon: WS + HTTP on :47821
+```
+
+Click handling is **daemon-less** — OS routes the link to a short-lived
+`bin/handler.js` process which parses the URL, picks the first installed
+client (priority order: CLI → popular GUI → cross-platform power), and spawns
+it. The optional `serve` daemon adds HTTP endpoints (`/status`, `/detect`,
+`/exec`) for browser-side integration with a Bearer-token-gated `/exec`.
+
+`npx @den.dance/network-diagram-mcp` with no args still runs the original
+stdio MCP server (back-compat — Smithery / Claude Desktop probes are
+unaffected).
+
+Top-5 clients per scheme (priority order, first-installed wins):
+
+| Scheme | Clients |
+|--------|---------|
+| `ssh`      | iTerm2 → Windows Terminal → GNOME Terminal → Terminal.app → kitty |
+| `postgres` | psql → TablePlus → DBeaver → Beekeeper Studio → pgAdmin 4 |
+| `redis`    | redis-cli → RedisInsight → Another Redis DM → Medis → RDM (legacy) |
+
+`postgresql://` aliases to `postgres`; `rediss://` is preserved and triggers
+`redis-cli --tls`.
 
 ## Available tools
 
@@ -295,7 +351,7 @@ A badge appears next to the NetMap version in the toolbar (click it to open Sett
 | 🔴 **MCP error** | Gave up — start the server, then toggle off / on to retry |
 | _(no badge)_ | Disabled in settings |
 
-Detailed status (with URL and hints) is shown inside **Settings → MCP Agent Bridge**.
+Detailed status (with URL and hints) is shown inside **Settings → Integrations → AI Agent (MCP)**.
 
 ## Running from source (for contributors)
 

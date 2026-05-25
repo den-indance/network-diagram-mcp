@@ -5,8 +5,9 @@
 # This MCP server is a stdio↔WebSocket bridge: the stdio side talks to the
 # LLM agent, the WebSocket side talks to an open NetMap browser tab at
 # https://map.den.dance/. The server is fully local — Smithery's inspector
-# will discover the 44 tools, but actual tool calls require a NetMap tab
-# with Settings → ⚙ → MCP Agent Bridge → Enable WebSocket connection.
+# will discover the 44 tools, but actual tool calls require an open NetMap
+# tab (the bridge is enabled by default since v1.2 — see Settings → ⚙ →
+# Integrations → AI Agent (MCP) to inspect or toggle).
 
 startCommand:
   type: stdio
@@ -18,7 +19,7 @@ startCommand:
       netmapMcpPort:
         type: number
         default: 47821
-        description: "Local WebSocket port the bridge listens on. Must match the URL in NetMap's Settings → MCP Agent Bridge."
+        description: "Local WebSocket port the bridge listens on. Must match the URL in NetMap's Settings → Integrations → AI Agent (MCP)."
   commandFunction:
     # A function that produces the CLI command to start the MCP on stdio.
     |-
